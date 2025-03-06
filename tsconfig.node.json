@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ES2023"],
+    "module": "NodeNext",              // Для ESM в Node.js
+    "moduleResolution": "NodeNext",    // Для корректного разрешения модулей в Node.js
+    "skipLibCheck": true,
+    "esModuleInterop": true,           // Для совместимости с CommonJS-модулями
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "./dist",                // Для вывода скомпилированных файлов (опционально)
+    "rootDir": "./src"                 // Корневая папка исходников
+  },
+  "include": ["src/data.ts"],          // Указываем конкретно серверный файл
+  "exclude": ["node_modules"]
+}
