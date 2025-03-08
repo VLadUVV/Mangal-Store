@@ -10,10 +10,10 @@ const dbPromise = open({
 });
 
 const app: Express = express();
-const port = 3500;
+const port = process.env.PORT || 3500;
 
 app.use(cors({
-  origin: '*',
+  origin: 'https://vladuvv-mangal-store-3420.twc1.net',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
