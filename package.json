@@ -99,5 +99,6 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
-  }
+  },
+    "proxy": "https://vladuvv-mangal-store-0176.twc1.net"
 }

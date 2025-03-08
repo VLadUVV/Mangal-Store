@@ -12,7 +12,11 @@ const dbPromise = open({
 const app: Express = express();
 const port = 3500;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Интерфейс для CartItem
@@ -25,7 +29,7 @@ interface CartItem {
 }
 
 // Инициализация базы данных
-async function initDB(): Promise<void> {
+async function initDB(): Promise<any> {
   const db = await dbPromise;
   try {
     await db.exec(`
@@ -72,7 +76,7 @@ async function initDB(): Promise<void> {
 }
 
 // Функции работы с пользователями
-async function addUser(fio: string, phone: string, email: string, password: string, date: string): Promise<void> {
+async function addUser(fio: string, phone: string, email: string, password: string, date: string): Promise<any> {
   const db = await dbPromise;
   const hashedPassword = await bcrypt.hash(password, 10);
   await db.run(
@@ -154,7 +158,7 @@ initDB().catch((err) => {
 });
 
 // Маршруты
-app.post("/api/register", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/register", async (req: Request, res: Response): Promise<any> => {
   const { fio, phone, email, password } = req.body as { fio?: string; phone?: string; email?: string; password?: string };
   const date = new Date().toISOString();
   if (!fio || !phone || !email || !password) {
@@ -176,7 +180,7 @@ app.post("/api/register", async (req: Request, res: Response): Promise<void> => 
   }
 });
 
-app.post("/api/login", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/login", async (req: Request, res: Response): Promise<any> => {
   const { email, password } = req.body as { email?: string; password?: string };
   if (!email || !password) {
     res.status(400).json({ error: "Email и пароль обязательны" });
@@ -195,7 +199,7 @@ app.post("/api/login", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post("/api/profile", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/profile", async (req: Request, res: Response): Promise<any> => {
   const { fio, phone, email, currentEmail } = req.body as { fio?: string; phone?: string; email?: string; currentEmail?: string };
   if (!fio || !phone || !email || !currentEmail) {
     res.status(400).json({ error: "Все поля обязательны" });
@@ -215,7 +219,7 @@ app.post("/api/profile", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.get("/api/reviews", async (_req: Request, res: Response): Promise<void> => {
+app.get("/api/reviews", async (_req: Request, res: Response): Promise<any> => {
   try {
     const reviews = await getAllReviews();
     res.json(reviews);
@@ -225,7 +229,7 @@ app.get("/api/reviews", async (_req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post("/api/reviews", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/reviews", async (req: Request, res: Response): Promise<any> => {
   const { author, rating, content, date } = req.body as { author?: string; rating?: number; content?: string; date?: string };
   if (!author || typeof rating !== "number" || !content || !date) {
     res.status(400).json({ error: "Все поля обязательны" });
@@ -240,7 +244,7 @@ app.post("/api/reviews", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-app.post("/api/orders", async (req: Request, res: Response): Promise<void> => {
+app.post("/api/orders", async (req: Request, res: Response): Promise<any> => {
   const { userEmail, userName, userPhone, items, total, date } = req.body as {
     userEmail?: string;
     userName?: string;
