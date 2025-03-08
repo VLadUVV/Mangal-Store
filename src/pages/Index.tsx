@@ -1221,6 +1221,21 @@ const products: Product[] = [
     category: "Костровые чаши",
     description: "Костровой очаг и мангал 2 в 1 — универсальное решение для уютных вечеров. Толщина стенок очага 3 мм, мангала — 4 мм. Разборная конструкция обеспечивает удобную доставку по всей России."
   },
+  {
+    id: 94,
+    name: "Мангал / гриль ",
+    price: 14900,
+    image: "/img/Categories/Mangals_roof/52.png",
+    images: [
+      "/img/Categories/Mangals_roof/52.png",
+      "/img/Categories/Mangals_roof/53.png",
+      "/img/Categories/Mangals_roof/54.png",
+      "/img/Categories/Mangals_roof/55.png",
+      "/img/Categories/Mangals_roof/56.png"
+    ],
+    category: "Мангалы с крышей",
+    description: "Мангал / гриль отличный вариант для дачи или загородного дома.У мангала есть крышка, закрыв которую можно томить продукты. Толщина стали 3мм. Длинна 80 см. Ширина 32. Высота мангала 95 см ( вместе с крышкой). Глубина 16,5."
+  },
 ];
 
 const Index = () => {
@@ -1246,7 +1261,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-screen">
       {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-mangal-50 to-mangal-100 py-16 md:py-24">
         <div className="container mx-auto px-4  text-center">
@@ -1431,7 +1446,7 @@ const Index = () => {
               onClick={() => setFilter("Индвидуальные заказы металлоконструкций под ваши размеры")}
               className="w-full sm:w-auto"
             >
-              Индвидуальные заказы металлоконструкций под ваши размеры
+              Индвидуальные заказы металлоконструкций
             </Button>
           </div>
         )}

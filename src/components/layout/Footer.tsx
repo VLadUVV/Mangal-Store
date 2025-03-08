@@ -17,26 +17,21 @@ const socialLinks = [
     logo: "/img/Icon/ozon_icon.svg",
   },
   {
-    name: "Telegram",
+    name: "Instagram",
     url: "#",
-    logo: "/img/Icon/tg_icon.svg",
+    logo: "/img/Icon/inst.svg",
   },
   {
-    name: "VKontakte",
-    url: "#",
-    logo: "/img/Icon/wk_icon.svg",
+    name: "Карты",
+    url: "https://yandex.ru/maps/2/saint-petersburg/geo/ulitsa_olgi_berggolts/8019457/?ll=30.417202%2C59.892931&z=15.94",
+    logo: "/img/Icon/nav.svg",
   },
 ];
 
 const CreatorLinks = [
   {
-    name: "Разработчик 1",
+    name: "Контакт",
     url: "https://t.me/kara0917",
-    logo: "/img/Icon/tg_icon.svg",
-  },
-  {
-    name: "Разработчик 2",
-    url: "https://t.me/RAFF_LEMs",
     logo: "/img/Icon/tg_icon.svg",
   },
 ];
@@ -86,9 +81,9 @@ export const Footer = () => {
             <p>Завод «ПАТРИОТ»</p>
           </div>
           <div className="text-center sm:text-left">
-            <h3 className="text-lg font-semibold mb-4">Команда разработчиков</h3>
+            <h3 className="text-lg font-semibold mb-1">Разработка сайтов</h3>
             <div className="grid grid-cols-1 gap-4 justify-center sm:justify-start">
-              {CreatorLinks.map((creator) => (
+            {CreatorLinks.map((creator) => (
                 <a
                   key={creator.name}
                   href={creator.url}
