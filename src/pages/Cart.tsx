@@ -163,7 +163,7 @@ export default function Cart() {
       .join("\n");
     const fullOrderDetails = `${orderDetails}\n\nИтого: ${total.toFixed(2)} ₽`;
     try {
-      const response = await fetch("http://mangal-store.ru:3500/api/orders", {
+      const response = await fetch("https://vladuvv-mangal-store-0176.twc1.net/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
