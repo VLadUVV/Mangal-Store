@@ -13,10 +13,11 @@ const app: Express = express();
 const port = process.env.PORT || 3500;
 
 app.use(cors({
-  origin: 'https://vladuvv-mangal-store-3420.twc1.net',
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors());
 app.use(express.json());
 
 // Интерфейс для CartItem
