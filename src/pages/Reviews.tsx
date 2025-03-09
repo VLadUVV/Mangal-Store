@@ -28,15 +28,21 @@ export default function Reviews() {
     try {
       const response = await fetch("/api/reviews");
       
+      // Проверка на корректный Content-Type
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error(`Некорректный формат ответа: ${contentType}`);
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Не удалось загрузить отзывы");
+        throw new Error(errorData.error || "Ошибка загрузки отзывов");
       }
-      
+
       const data: Review[] = await response.json();
       setReviews(data);
     } catch (error) {
-      console.error("Ошибка загрузки отзывов:", error);
+      console.error("Ошибка:", error);
       toast({
         title: "Ошибка",
         description: error.message || "Не удалось загрузить отзывы",
@@ -49,7 +55,7 @@ export default function Reviews() {
     if (!newReview.trim()) {
       toast({
         title: "Ошибка",
-        description: "Пожалуйста, напишите свой отзыв перед отправкой",
+        description: "Введите текст отзыва",
         variant: "destructive",
       });
       return;
@@ -62,12 +68,14 @@ export default function Reviews() {
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          author,
-          rating,
-          content: newReview,
-        }),
+        body: JSON.stringify({ author, rating, content: newReview }),
       });
+
+      // Проверка на корректный JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType?.includes("application/json")) {
+        throw new Error(`Некорректный ответ сервера: ${contentType}`);
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -78,9 +86,9 @@ export default function Reviews() {
       setReviews([savedReview, ...reviews]);
       setNewReview("");
       setRating(5);
-      toast({ title: "Успех", description: "Ваш отзыв принят. Спасибо!" });
-    } catch (error: any) {
-      console.error("Ошибка отправки отзыва:", error);
+      toast({ title: "Успех", description: "Отзыв принят!" });
+    } catch (error) {
+      console.error("Ошибка:", error);
       toast({
         title: "Ошибка",
         description: error.message || "Не удалось отправить отзыв",
@@ -88,7 +96,7 @@ export default function Reviews() {
       });
     }
   };
-
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center mb-8 text-mangal-600">Отзывы</h1>

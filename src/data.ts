@@ -16,7 +16,7 @@ app.use(express.json());
 
 
 const corsOptions = {
-  origin: "*",
+  origin: "https://vladuvv-mangal-store-3420.twc1.net",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
@@ -223,17 +223,17 @@ app.post("/api/profile", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-app.get("/api/reviews", async (_req: Request, res: Response): Promise<any> => {
+app.get("/api/reviews", async (_req: Request, res: Response) => {
   try {
     const reviews = await getAllReviews();
-    res.json(reviews);
+    res.json(reviews); // ✅ Всегда возвращаем JSON
   } catch (err) {
     console.error("Ошибка получения отзывов:", err);
-    res.status(500).json({ error: "Ошибка сервера" });
+    res.status(500).json({ error: "Ошибка сервера" }); // ✅ Ошибка в формате JSON
   }
 });
 
-app.post("/api/reviews", async (req: Request, res: Response): Promise<any> => {
+app.post("/api/reviews", async (req: Request, res: Response) => {
   const { author, rating, content, date } = req.body as { author?: string; rating?: number; content?: string; date?: string };
   if (!author || typeof rating !== "number" || !content || !date) {
     res.status(400).json({ error: "Все поля обязательны" });
