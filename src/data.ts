@@ -12,17 +12,18 @@ const dbPromise = open({
 const app: Express = express();
 const port = process.env.PORT || 3500;
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-app.options('*', cors());
 app.use(express.json());
+
+// Настройка CORS
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
 });
 
 // Интерфейс для CartItem
@@ -275,3 +276,5 @@ app.post("/api/orders", async (req: Request, res: Response): Promise<any> => {
 app.listen(port, () => {
   console.log(`🚀 Сервер запущен на http://localhost:${port}`);
 });
+
+initDB();

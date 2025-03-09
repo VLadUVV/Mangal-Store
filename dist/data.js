@@ -1,5 +1,4 @@
 import express from "express";
-import cors from "cors";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import bcrypt from "bcrypt";
@@ -8,9 +7,20 @@ const dbPromise = open({
     driver: sqlite3.Database,
 });
 const app = express();
-const port = 3500;
-app.use(cors());
+const port = process.env.PORT || 3500;
 app.use(express.json());
+// Настройка CORS
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.sendStatus(200);
+    }
+    else {
+        next();
+    }
+});
 // Инициализация базы данных
 async function initDB() {
     const db = await dbPromise;
@@ -214,3 +224,4 @@ app.post("/api/orders", async (req, res) => {
 app.listen(port, () => {
     console.log(`🚀 Сервер запущен на http://localhost:${port}`);
 });
+initDB();
