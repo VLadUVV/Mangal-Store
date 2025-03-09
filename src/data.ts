@@ -12,17 +12,6 @@ const dbPromise = open({
 const app: Express = express();
 const port = process.env.PORT || 3500;
 
-app.use(express.json());
-
-
-const corsOptions = {
-  origin: "https://vladuvv-mangal-store-3420.twc1.net",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use(cors(corsOptions));
-
 // Интерфейс для CartItem
 interface CartItem {
   id: number;
@@ -32,8 +21,33 @@ interface CartItem {
   image: string;
 }
 
+// Конфигурация CORS
+const corsOptions = {
+  origin: "https://vladuvv-mangal-store-3420.twc1.net",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+// Middleware
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// Логирование запросов
+app.use((req: Request, res: Response, next: NextFunction) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// Установка Content-Type для всех ответов
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader("Content-Type", "application/json");
+  next();
+});
+
 // Инициализация базы данных
-async function initDB(): Promise<any> {
+async function initDB(): Promise<void> {
   const db = await dbPromise;
   try {
     await db.exec(`
@@ -80,7 +94,7 @@ async function initDB(): Promise<any> {
 }
 
 // Функции работы с пользователями
-async function addUser(fio: string, phone: string, email: string, password: string, date: string): Promise<any> {
+async function addUser(fio: string, phone: string, email: string, password: string, date: string): Promise<void> {
   const db = await dbPromise;
   const hashedPassword = await bcrypt.hash(password, 10);
   await db.run(
@@ -89,7 +103,14 @@ async function addUser(fio: string, phone: string, email: string, password: stri
   );
 }
 
-async function getUserByEmail(email: string): Promise<{ id: number; fio: string; phone: string; email: string; password: string; date: string } | undefined> {
+async function getUserByEmail(email: string): Promise<{ 
+  id: number; 
+  fio: string; 
+  phone: string; 
+  email: string; 
+  password: string; 
+  date: string 
+} | undefined> {
   const db = await dbPromise;
   return db.get("SELECT * FROM users WHERE email = ?", [email]);
 }
@@ -104,7 +125,13 @@ async function updateUser(fio: string, phone: string, email: string, currentEmai
 }
 
 // Функции работы с отзывами
-async function addReview(author: string, rating: number, content: string, date: string): Promise<{ id: number; author: string; rating: number; content: string; date: string }> {
+async function addReview(author: string, rating: number, content: string, date: string): Promise<{ 
+  id: number; 
+  author: string; 
+  rating: number; 
+  content: string; 
+  date: string 
+}> {
   const db = await dbPromise;
   const result = await db.run(
     "INSERT INTO reviews (author, rating, content, date) VALUES (?, ?, ?, ?)",
@@ -113,12 +140,18 @@ async function addReview(author: string, rating: number, content: string, date: 
   return { id: result.lastID!, author, rating, content, date };
 }
 
-async function getAllReviews(): Promise<{ id: number; author: string; rating: number; content: string; date: string }[]> {
+async function getAllReviews(): Promise<{ 
+  id: number; 
+  author: string; 
+  rating: number; 
+  content: string; 
+  date: string 
+}[]> {
   const db = await dbPromise;
   return db.all("SELECT * FROM reviews ORDER BY date DESC");
 }
 
-// Функция добавления заказа с подробным логированием
+// Функция добавления заказа
 async function addOrder(
   userEmail: string,
   userName: string,
@@ -126,22 +159,24 @@ async function addOrder(
   total: number,
   items: CartItem[],
   date: string
-): Promise<{ id: number; userEmail: string; userName: string; userPhone: string; total: number; items: CartItem[]; date: string }> {
+): Promise<{ 
+  id: number; 
+  userEmail: string; 
+  userName: string; 
+  userPhone: string; 
+  total: number; 
+  items: CartItem[]; 
+  date: string 
+}> {
   const db = await dbPromise;
   try {
-    console.log("Добавление заказа:", { userEmail, userName, userPhone, total, items, date });
-
-    // Вставка в таблицу orders
     const orderResult = await db.run(
       "INSERT INTO orders (userEmail, userName, userPhone, total, date) VALUES (?, ?, ?, ?, ?)",
       [userEmail, userName, userPhone, total, date]
     );
     const orderId = orderResult.lastID!;
-    console.log("Заказ добавлен с ID:", orderId);
 
-    // Вставка элементов заказа
     for (const item of items) {
-      console.log("Добавление элемента заказа:", item);
       await db.run(
         "INSERT INTO order_items (orderId, name, price, quantity) VALUES (?, ?, ?, ?)",
         [orderId, item.name, item.price, item.quantity]
@@ -150,8 +185,8 @@ async function addOrder(
 
     return { id: orderId, userEmail, userName, userPhone, total, items, date };
   } catch (err) {
-    console.error("Детальная ошибка в addOrder:", err);
-    throw err; // Передаем ошибку дальше для обработки в маршруте
+    console.error("Ошибка добавления заказа:", err);
+    throw err;
   }
 }
 
@@ -162,40 +197,61 @@ initDB().catch((err) => {
 });
 
 // Маршруты
-app.post("/api/register", async (req: Request, res: Response): Promise<any> => {
-  const { fio, phone, email, password } = req.body as { fio?: string; phone?: string; email?: string; password?: string };
-  const date = new Date().toISOString();
-  if (!fio || !phone || !email || !password) {
-    res.status(400).json({ error: "Все поля обязательны" });
-    return;
-  }
+app.post("/api/register", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { fio, phone, email, password } = req.body;
+    const date = new Date().toISOString();
+    
+    if (!fio || !phone || !email || !password) {
+      res.status(400).json({ error: "Все поля обязательны" });
+      return;
+    }
+
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
       res.status(409).json({ error: "Пользователь с таким email уже существует" });
       return;
     }
+
     await addUser(fio, phone, email, password, date);
     const newUser = await getUserByEmail(email);
-    res.status(201).json({ fio: newUser!.fio, email: newUser!.email, phone: newUser!.phone });
+    res.status(201).json({ 
+      fio: newUser!.fio, 
+      email: newUser!.email, 
+      phone: newUser!.phone 
+    });
   } catch (err) {
-    console.error("Ошибка при регистрации:", err);
-    res.status(500).json({ error: "Ошибка сервера" });
+    console.error("Ошибка регистрации:", err);
+    
+    if (err instanceof Error && err.message.includes("SQLITE_CONSTRAINT")) {
+      res.status(409).json({ 
+        error: "Пользователь с таким email или телефоном уже существует"
+      });
+      return;
+    }
+    
+    res.status(500).json({ 
+      error: "Ошибка сервера",
+      message: process.env.NODE_ENV === "development" ? err.message : undefined
+    });
   }
 });
 
-app.post("/api/login", async (req: Request, res: Response): Promise<any> => {
-  const { email, password } = req.body as { email?: string; password?: string };
-  if (!email || !password) {
-    res.status(400).json({ error: "Email и пароль обязательны" });
-    return;
-  }
+app.post("/api/login", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      res.status(400).json({ error: "Email и пароль обязательны" });
+      return;
+    }
+
     const user = await getUserByEmail(email);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({ error: "Неверный email или пароль" });
       return;
     }
+    
     res.json({ fio: user.fio, email: user.email, phone: user.phone });
   } catch (err) {
     console.error("Ошибка входа:", err);
@@ -203,37 +259,59 @@ app.post("/api/login", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-app.post("/api/profile", async (req: Request, res: Response): Promise<any> => {
-  const { fio, phone, email, currentEmail } = req.body as { fio?: string; phone?: string; email?: string; currentEmail?: string };
-  if (!fio || !phone || !email || !currentEmail) {
-    res.status(400).json({ error: "Все поля обязательны" });
-    return;
-  }
+app.post("/api/profile", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { fio, phone, email, currentEmail } = req.body;
+    
+    if (!fio || !phone || !email || !currentEmail) {
+      res.status(400).json({ error: "Все поля обязательны" });
+      return;
+    }
+
     const updated = await updateUser(fio, phone, email, currentEmail);
     if (!updated) {
       res.status(404).json({ error: "Пользователь не найден" });
       return;
     }
+    
     const updatedUser = await getUserByEmail(email);
-    res.json({ fio: updatedUser!.fio, email: updatedUser!.email, phone: updatedUser!.phone });
+    res.json({ 
+      fio: updatedUser!.fio, 
+      email: updatedUser!.email, 
+      phone: updatedUser!.phone 
+    });
   } catch (err) {
     console.error("Ошибка обновления профиля:", err);
     res.status(500).json({ error: "Ошибка сервера" });
   }
 });
 
-app.get("/api/reviews", async (_req: Request, res: Response) => {
-  res.json({ message: 'Это правильный ответ от API' });
+app.get("/api/reviews", async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const reviews = await getAllReviews();
+    res.json(reviews);
+  } catch (err) {
+    console.error("Ошибка получения отзывов:", err);
+    res.status(500).json({ error: "Ошибка сервера" });
+  }
 });
 
-app.post("/api/reviews", async (req: Request, res: Response) => {
-  const { author, rating, content, date } = req.body as { author?: string; rating?: number; content?: string; date?: string };
-  if (!author || typeof rating !== "number" || !content || !date) {
-    res.status(400).json({ error: "Все поля обязательны" });
-    return;
-  }
+app.post("/api/reviews", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { author, rating, content, date } = req.body;
+    const errors = [];
+    
+    if (!author?.trim()) errors.push("Автор обязателен");
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      errors.push("Рейтинг должен быть числом от 1 до 5");
+    }
+    if (!content?.trim()) errors.push("Текст отзыва обязателен");
+    
+    if (errors.length > 0) {
+      res.status(400).json({ errors });
+      return;
+    }
+
     const newReview = await addReview(author, rating, content, date);
     res.status(201).json(newReview);
   } catch (err) {
@@ -242,20 +320,15 @@ app.post("/api/reviews", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/orders", async (req: Request, res: Response): Promise<any> => {
-  const { userEmail, userName, userPhone, items, total, date } = req.body as {
-    userEmail?: string;
-    userName?: string;
-    userPhone?: string;
-    items?: CartItem[];
-    total?: number;
-    date?: string;
-  };
-  if (!userEmail || !userName || !userPhone || !Array.isArray(items) || typeof total !== "number" || !date) {
-    res.status(400).json({ error: "Все поля (userEmail, userName, userPhone, items, total, date) обязательны" });
-    return;
-  }
+app.post("/api/orders", async (req: Request, res: Response): Promise<void> => {
   try {
+    const { userEmail, userName, userPhone, items, total, date } = req.body;
+    
+    if (!userEmail || !userName || !userPhone || !Array.isArray(items) || typeof total !== "number" || !date) {
+      res.status(400).json({ error: "Все поля обязательны" });
+      return;
+    }
+
     const newOrder = await addOrder(userEmail, userName, userPhone, total, items, date);
     res.status(201).json(newOrder);
   } catch (err) {
@@ -264,11 +337,20 @@ app.post("/api/orders", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`🚀 Сервер запущен на ${port}`);
+// Обработка 404 (должна быть после всех маршрутов)
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ error: "Маршрут не найден" });
 });
 
+// Глобальный обработчик ошибок (должен быть последним)
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("Глобальная ошибка:", err);
-  res.status(500).json({ error: "Что-то пошло не так" }); // ✅ JSON-ответ
+  res.status(500).json({
+    error: "Внутренняя ошибка сервера",
+    message: process.env.NODE_ENV === "development" ? err.message : undefined
+  });
+});
+
+app.listen(port, () => {
+  console.log(`🚀 Сервер запущен на порту ${port}`);
 });
