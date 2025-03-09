@@ -26,7 +26,7 @@ export default function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch("https://vladuvv-mangal-store-0176.twc1.net/api/reviews");
+      const response = await fetch("https://vladuvv-mangal-store-0176.twc1.net:3500/api/reviews");
       if (!response.ok) throw new Error("Не удалось загрузить отзывы");
       const data = await response.json();
       setReviews(data);
@@ -64,7 +64,7 @@ export default function Reviews() {
     try {
       console.log("Отправляемые данные:", review);
 
-      const response = await fetch("https://vladuvv-mangal-store-0176.twc1.net/api/reviews", {
+      const response = await fetch("https://vladuvv-mangal-store-0176.twc1.net:3500/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(review),

@@ -271,7 +271,7 @@ app.post("/api/orders", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.listen(port, () => {
-  console.log(`🚀 Сервер запущен на http://localhost:${port}`);
+  console.log(`🚀 Сервер запущен на ${port}`);
 });
 
 initDB();

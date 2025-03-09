@@ -18,7 +18,7 @@ const socialLinks = [
   },
   {
     name: "Instagram",
-    url: "#",
+    url: "https://www.instagram.com/mangal_store_spb?igsh=NGhxanJheHB4OWY5",
     logo: "/img/Icon/inst.svg",
   },
   {
