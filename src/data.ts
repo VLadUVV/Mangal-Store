@@ -224,13 +224,7 @@ app.post("/api/profile", async (req: Request, res: Response): Promise<any> => {
 });
 
 app.get("/api/reviews", async (_req: Request, res: Response) => {
-  try {
-    const reviews = await getAllReviews();
-    res.json(reviews); // ✅ Всегда возвращаем JSON
-  } catch (err) {
-    console.error("Ошибка получения отзывов:", err);
-    res.status(500).json({ error: "Ошибка сервера" }); // ✅ Ошибка в формате JSON
-  }
+  res.json({ message: 'Это правильный ответ от API' });
 });
 
 app.post("/api/reviews", async (req: Request, res: Response) => {
