@@ -28,17 +28,19 @@ export default function Reviews() {
     try {
       const response = await fetch("/api/reviews");
       
-      // Проверка на корректный Content-Type
-      const contentType = response.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        throw new Error(`Некорректный формат ответа: ${contentType}`);
+      // Проверка Content-Type
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const htmlError = await response.text();
+        console.error("Сервер вернул HTML:", htmlError);
+        throw new Error("Сервер вернул HTML вместо JSON");
       }
-
+  
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Ошибка загрузки отзывов");
+        throw new Error(errorData.error || "Ошибка загрузки");
       }
-
+  
       const data: Review[] = await response.json();
       setReviews(data);
     } catch (error) {
@@ -96,7 +98,7 @@ export default function Reviews() {
       });
     }
   };
-  
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold text-center mb-8 text-mangal-600">Отзывы</h1>

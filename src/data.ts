@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
@@ -274,4 +274,7 @@ app.listen(port, () => {
   console.log(`🚀 Сервер запущен на ${port}`);
 });
 
-initDB();
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Глобальная ошибка:", err);
+  res.status(500).json({ error: "Что-то пошло не так" }); // ✅ JSON-ответ
+});
