@@ -27,14 +27,19 @@ export default function Reviews() {
   const fetchReviews = async () => {
     try {
       const response = await fetch("/api/reviews");
-      if (!response.ok) throw new Error("Не удалось загрузить отзывы");
-      const data = await response.json();
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Не удалось загрузить отзывы");
+      }
+      
+      const data: Review[] = await response.json();
       setReviews(data);
     } catch (error) {
       console.error("Ошибка загрузки отзывов:", error);
       toast({
         title: "Ошибка",
-        description: "Не удалось загрузить отзывы.",
+        description: error.message || "Не удалось загрузить отзывы",
         variant: "destructive",
       });
     }
@@ -44,7 +49,7 @@ export default function Reviews() {
     if (!newReview.trim()) {
       toast({
         title: "Ошибка",
-        description: "Пожалуйста, напишите свой отзыв перед отправкой.",
+        description: "Пожалуйста, напишите свой отзыв перед отправкой",
         variant: "destructive",
       });
       return;
@@ -53,52 +58,32 @@ export default function Reviews() {
     const profile = getGlobalProfile();
     const author = profile?.fio || "Гость";
 
-    const review: Review = {
-      id: Date.now(),
-      author,
-      rating,
-      content: newReview,
-      date: new Date().toISOString().split("T")[0],
-    };
-
     try {
-      console.log("Отправляемые данные:", review);
-
       const response = await fetch("/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(review),
+        body: JSON.stringify({
+          author,
+          rating,
+          content: newReview,
+        }),
       });
 
-      const responseText = await response.text();
-      console.log("Ответ сервера (текст):", responseText);
-
       if (!response.ok) {
-        let errorData;
-        try {
-          errorData = JSON.parse(responseText);
-        } catch (jsonError) {
-          console.error("Ошибка парсинга JSON:", jsonError);
-          throw new Error(`Не удалось отправить отзыв: сервер вернул невалидный JSON (${response.status})`);
-        }
-        console.error("Ошибка от сервера:", errorData);
-        throw new Error(`Не удалось отправить отзыв: ${errorData.error || response.statusText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Ошибка отправки отзыва");
       }
 
-      const savedReview = JSON.parse(responseText);
-      console.log("Полученные данные от сервера:", savedReview);
+      const savedReview = await response.json();
       setReviews([savedReview, ...reviews]);
       setNewReview("");
       setRating(5);
-      toast({
-        title: "Успешно",
-        description: "Ваш отзыв принят. Спасибо!",
-      });
+      toast({ title: "Успех", description: "Ваш отзыв принят. Спасибо!" });
     } catch (error: any) {
-      console.error("Ошибка отправки отзыва:", error.message);
+      console.error("Ошибка отправки отзыва:", error);
       toast({
         title: "Ошибка",
-        description: error.message || "Не удалось отправить отзыв.",
+        description: error.message || "Не удалось отправить отзыв",
         variant: "destructive",
       });
     }
