@@ -356,6 +356,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     message: process.env.NODE_ENV === "development" ? err.message : undefined
   });
 });
+app.get('/', (req, res) => {
+  res.status(200).send('Server is running');
+});
+
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`✅ Backend running on http://0.0.0.0:${port}`);
