@@ -29,6 +29,13 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://vladuvv-mangal-store-3df2.twc1.net/");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
+});
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
