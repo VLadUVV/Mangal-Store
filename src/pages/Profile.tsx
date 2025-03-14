@@ -54,7 +54,7 @@ export default function Profile() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://vladuvv-mangal-store-3df2.twc1.net/api/login", {
+      const response = await fetch("http://localhost:3500/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -78,7 +78,7 @@ export default function Profile() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("https://vladuvv-mangal-store-3df2.twc1.net/api/register", {
+      const response = await fetch("http://localhost:3500/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registerData),
@@ -100,7 +100,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       const currentEmail = globalProfile.current?.email;
-      const response = await fetch("https://vladuvv-mangal-store-3df2.twc1.net/api/profile", {
+      const response = await fetch("http://localhost:3500/api/profile", {
         method: "POST", 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...profile, currentEmail }),

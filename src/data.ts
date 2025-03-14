@@ -23,7 +23,7 @@ interface CartItem {
 
 // Конфигурация CORS
 const corsOptions = {
-  origin: "https://vladuvv-mangal-store-3df2.twc1.net",
+  origin: "http://localhost:3500",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,

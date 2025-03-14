@@ -26,7 +26,7 @@ export default function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const response = await fetch("https://vladuvv-mangal-store-3df2.twc1.net/api/reviews");
+      const response = await fetch("http://localhost:3500/api/reviews");
       
       // Проверка Content-Type
       const contentType = response.headers.get("content-type") || "";
@@ -67,7 +67,7 @@ export default function Reviews() {
     const author = profile?.fio || "Гость";
 
     try {
-      const response = await fetch("https://vladuvv-mangal-store-3df2.twc1.net/api/reviews", {
+      const response = await fetch("http://localhost:3500/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ author, rating, content: newReview }),

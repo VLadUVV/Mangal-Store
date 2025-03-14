@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     port: 3000, // Фронт на 3000
     proxy: {
       '/api': {
-        target: 'https://vladuvv-mangal-store-3df2.twc1.net', // Бэк на 3500
+        target: 'http://localhost:3500', // Бэк на 3500
         changeOrigin: true,
         secure: false,
       },
