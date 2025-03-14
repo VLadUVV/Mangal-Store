@@ -23,13 +23,12 @@ interface CartItem {
 
 // Конфигурация CORS
 const corsOptions = {
-  origin: "http://localhost:3500",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
-
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -232,7 +231,7 @@ app.post("/api/register", async (req: Request, res: Response): Promise<void> => 
     
     res.status(500).json({ 
       error: "Ошибка сервера",
-      message: process.env.NODE_ENV === "development" ? err.message : undefined
+      message: process.env.NODE_ENV === "development" && err instanceof Error ? err.message : undefined
     });
   }
 });
