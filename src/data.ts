@@ -23,19 +23,12 @@ interface CartItem {
 
 // Конфигурация CORS
 const corsOptions = {
-  origin: "*",
+  origin: "https://vladuvv-mangal-store-3df2.twc1.net",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://vladuvv-mangal-store-3df2.twc1.net/");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-  next();
-});
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -64,8 +57,10 @@ async function initDB(): Promise<void> {
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         date TEXT NOT NULL
-      );
-      
+      )
+    `);
+    
+    await db.exec(`
       CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userEmail TEXT NOT NULL,
@@ -73,8 +68,10 @@ async function initDB(): Promise<void> {
         userPhone TEXT NOT NULL,
         total REAL NOT NULL,
         date TEXT NOT NULL
-      );
-
+      )
+    `);
+    
+    await db.exec(`
       CREATE TABLE IF NOT EXISTS order_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         orderId INTEGER,
@@ -82,16 +79,18 @@ async function initDB(): Promise<void> {
         price REAL NOT NULL,
         quantity INTEGER NOT NULL,
         FOREIGN KEY (orderId) REFERENCES orders (id) ON DELETE CASCADE
-      );
-
+      )
+    `);
+    
+    await db.exec(`
       CREATE TABLE IF NOT EXISTS reviews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         author TEXT NOT NULL,
         rating INTEGER NOT NULL,
         content TEXT NOT NULL,
         date TEXT NOT NULL
-      );
-    `);
+      )
+    `);    
     console.log("📦 База данных успешно инициализирована");
   } catch (err) {
     console.error("Ошибка при инициализации базы данных:", err);
@@ -349,13 +348,8 @@ app.use((req: Request, res: Response) => {
 });
 
 // Глобальный обработчик ошибок (должен быть последним)
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error("Глобальная ошибка:", err);
-  res.status(500).json({
-    error: "Внутренняя ошибка сервера",
-    message: process.env.NODE_ENV === "development" ? err.message : undefined
-  });
-});
+
+
 app.get('/', (req, res) => {
   res.status(200).send('Server is running');
 });
@@ -363,4 +357,12 @@ app.get('/', (req, res) => {
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`✅ Backend running on http://0.0.0.0:${port}`);
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error("Глобальная ошибка:", err);
+  res.status(500).json({
+    error: "Внутренняя ошибка сервера",
+    message: process.env.NODE_ENV === "development" ? err.message : undefined
+  });
 });
